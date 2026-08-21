@@ -16,6 +16,11 @@ jobs:
       - run: npm install
       - run: npx cap add android
       - run: npx cap sync android
+      - name: Add Firebase
+        run: |
+          cp google-services.json android/app/google-services.json
+          sed -i "/com.android.tools.build:gradle/a\        classpath 'com.google.gms:google-services:4.4.2'" android/build.gradle
+          echo "apply plugin: 'com.google.gms.google-services'" >> android/app/build.gradle
       - run: cd android && chmod +x gradlew && ./gradlew assembleDebug --stacktrace
       - uses: actions/upload-artifact@v4
         with:
