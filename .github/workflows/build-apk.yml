@@ -1,6 +1,8 @@
 name: Build APK
+
 on:
   workflow_dispatch: {}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,16 +15,23 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-      - run: npm install
-      - run: npx cap add android
-      - run: npx cap sync android
-      - name: Add Firebase
+      - name: Install Capacitor
+        run: npm install
+      - name: Add Android platform
+        run: npx cap add android
+      - name: Sync
+        run: npx cap sync android
+      - name: App icon
+        run: npx capacitor-assets generate --android
+      - name: Add Firebase (google-services)
         run: |
           cp google-services.json android/app/google-services.json
           sed -i "/com.android.tools.build:gradle/a\        classpath 'com.google.gms:google-services:4.4.2'" android/build.gradle
           echo "apply plugin: 'com.google.gms.google-services'" >> android/app/build.gradle
-      - run: cd android && chmod +x gradlew && ./gradlew assembleDebug --stacktrace
-      - uses: actions/upload-artifact@v4
+      - name: Build debug APK
+        run: cd android && chmod +x gradlew && ./gradlew assembleDebug --stacktrace
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
           name: plot-crm-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
