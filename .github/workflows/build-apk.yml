@@ -21,6 +21,10 @@ jobs:
         run: npx cap add android
       - name: Sync
         run: npx cap sync android
+      - name: Add location permission
+        run: |
+          sed -i 's#</manifest>#    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n</manifest>#' android/app/src/main/AndroidManifest.xml
+          grep -i location android/app/src/main/AndroidManifest.xml
       - name: App icon
         run: npx capacitor-assets generate --android
       - name: Add Firebase (google-services)
